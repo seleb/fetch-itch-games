@@ -15,11 +15,11 @@ const fs = require('fs');
 		.flatMap(({ title, cover_url, still_cover_url }) => [
 			{
 				url: cover_url,
-				dest: `${sanitizeFilename(title).trim()}/preview`,
+				dest: `${sanitizeFilename(title.replace(/\./g,'')).trim()}/preview`,
 			},
 			{
 				url: still_cover_url || cover_url,
-				dest: `${sanitizeFilename(title).trim()}/thumbnail`,
+				dest: `${sanitizeFilename(title.replace(/\./g,'')).trim()}/thumbnail`,
 			},
 		])
 		.reduce(async (result, i) => {
@@ -32,8 +32,8 @@ const fs = require('fs');
 		.sort((a, b) => b.published_at.localeCompare(a.published_at))
 		.map(({ title, short_text: tagline, published_at, url, cover_url, still_cover_url }) => ({
 			title,
-			thumbnail: `thumbnails/${sanitizeFilename(title).trim()}/preview.${cover_url.split('.').pop()}`,
-			preview: `thumbnails/${sanitizeFilename(title).trim()}/thumbnail.${(still_cover_url || cover_url).split('.').pop()}`,
+			thumbnail: `thumbnails/${sanitizeFilename(title.replace(/\./g,'')).trim()}/preview.${cover_url.split('.').pop()}`,
+			preview: `thumbnails/${sanitizeFilename(title.replace(/\./g,'')).trim()}/thumbnail.${(still_cover_url || cover_url).split('.').pop()}`,
 			association: '',
 			date: moment(published_at).format('MMMM YYYY'),
 			tagline,
