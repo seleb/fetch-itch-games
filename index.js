@@ -32,8 +32,8 @@ const fs = require('fs');
 		.sort((a, b) => b.published_at.localeCompare(a.published_at))
 		.map(({ title, short_text: tagline, published_at, url, cover_url, still_cover_url }) => ({
 			title,
-			thumbnail: `thumbnails/${sanitizeFilename(title).trim()}/preview.${cover_url.split('.').pop()}`,
-			preview: `thumbnails/${sanitizeFilename(title).trim()}/thumbnail.${(still_cover_url || cover_url).split('.').pop()}`,
+			thumbnail: `thumbnails/${sanitizeFilename(title).trim()}/thumbnail.${cover_url.split('.').pop()}`,
+			preview: `thumbnails/${sanitizeFilename(title).trim()}/preview.${(still_cover_url || cover_url).split('.').pop()}`,
 			association: '',
 			date: moment(published_at).format('MMMM YYYY'),
 			tagline,
