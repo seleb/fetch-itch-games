@@ -1,0 +1,19 @@
+{
+  "name": "fetch-itch-games",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "dotenv-load": "^2.0.0",
+    "download": "^8.0.0",
+    "moment": "^2.29.1",
+    "node-fetch": "^2.6.1",
+    "sanitize-filename": "^1.6.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "dotenv-load node index.js"
+  },
+  "author": "Sean S. LeBlanc <sean.s.leblanc@gmail.com>",
+  "license": "UNLICENSED"
+}
