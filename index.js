@@ -1,8 +1,8 @@
-const fetch = require('node-fetch');
-const moment = require('moment');
-const sanitizeFilename = require('sanitize-filename');
-const download = require('download');
-const fs = require('fs');
+import download from 'download';
+import fs from 'fs';
+import moment from 'moment';
+import fetch from 'node-fetch';
+import sanitizeFilename from 'sanitize-filename';
 
 (async function fetchGames() {
 	const apiKey = process.env.API_KEY;
