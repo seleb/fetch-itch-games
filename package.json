@@ -13,10 +13,10 @@
     "which": "^2.0.2"
   },
   "scripts": {
-    "start": "dotenv-load node index.js"
+    "start": "node index.js"
   },
   "bin": {
-    "fetch-itch-games": "dotenv-load node index.js"
+    "fetch-itch-games": "node index.js"
   },
   "author": "Sean S. LeBlanc <sean.s.leblanc@gmail.com>",
   "license": "UNLICENSED"

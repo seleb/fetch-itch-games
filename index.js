@@ -2,6 +2,7 @@
 
 // @ts-check
 import { Client, createNotification, createRequest, Instance } from 'butlerd';
+import dotenvLoad from 'dotenv-load';
 import download from 'download';
 import fs from 'fs';
 import fetch from 'node-fetch';
@@ -9,6 +10,7 @@ import os from 'os';
 import path from 'path';
 import sanitizeFilename from 'sanitize-filename';
 import which from 'which';
+dotenvLoad();
 
 const apiKey = process.env.API_KEY;
 if (!apiKey) {
