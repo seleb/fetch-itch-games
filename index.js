@@ -119,16 +119,19 @@ async function getButler() {
 		.filter(i => i.url)
 		.reduce(async (result, i) => {
 			await result;
+			console.log('Saving ', i.dest);
 			return download(i.url, dirOutput, { filename: `${i.dest}.${i.url.split('.').pop()}` });
 		}, Promise.resolve());
 
 	// save metadata
 	await games.reduce(async (result, i) => {
 		await result;
+		console.log('Saving metadata for ', i.title);
 		return fs.promises.writeFile(path.join(dirOutput, sanitizeFilename(i.title), 'metadata.json'), JSON.stringify(i, undefined, '\t'));
 	}, Promise.resolve());
 
 	const totalMetadata = games.sort((a, b) => b.published_at.localeCompare(a.published_at));
+	console.log('Saving total metadata');
 	await fs.promises.writeFile(path.join(dirOutput, 'metadata.json'), JSON.stringify(totalMetadata, undefined, '\t'));
 })()
 	.then(() => {
