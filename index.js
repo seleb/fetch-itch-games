@@ -87,11 +87,13 @@ const files = [];
 (async function main() {
 	const butler = await getButler();
 
+	console.log('Getting game list...');
 	const games = await getGames();
 
 	const uploads = (
 		await games.reduce(async (acc, game) => {
 			const result = await acc;
+			console.log(`Getting uploads for "${game.title}"...`);
 			const { uploads } = await butler.request('Fetch.GameUploads', { gameId: game.id, compatible: false, fresh: true });
 			result.push(uploads.map(i => ({ ...i, game })));
 			return result;
@@ -147,7 +149,7 @@ const files = [];
 			const fileThumbnail = `${i.dest}.${i.url.split('.').pop()}`;
 			files.push(path.join(dirOutput, fileThumbnail));
 			if (dryRun) return result;
-			console.log('Saving ', i.dest);
+			console.log(`Saving "${i.dest}"...`);
 			return download(i.url, dirOutput, { filename: fileThumbnail });
 		}, Promise.resolve());
 
@@ -157,14 +159,14 @@ const files = [];
 		const fileMetadata = path.join(dirOutput, sanitizeFilename(i.title), 'metadata.json');
 		files.push(fileMetadata);
 		if (dryRun) return;
-		console.log('Saving metadata for ', i.title);
+		console.log(`Saving metadata "${i.title}"...`);
 		return fs.promises.writeFile(fileMetadata, JSON.stringify(i, undefined, '\t'));
 	}, Promise.resolve());
 
 	const fileTotalMetadata = path.join(dirOutput, 'metadata.json');
 	files.push(path.join(dirOutput, 'metadata.json'));
 	if (dryRun) return;
-	console.log('Saving total metadata');
+	console.log('Saving total metadata...');
 	await fs.promises.writeFile(fileTotalMetadata, JSON.stringify(games, undefined, '\t'));
 })()
 	.then(() => {
