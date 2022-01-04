@@ -9,9 +9,7 @@
   "scripts": {
     "start": "node index.js"
   },
-  "bin": {
-    "fetch-itch-games": "./index.js"
-  },
+  "bin": "./index.js",
   "files": [
     "index.js",
     ".env"
