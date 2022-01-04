@@ -67,44 +67,42 @@ async function getButler() {
 	const games = await getGames();
 
 	const uploads = (
-		await Promise.all(
-			games.map(async game => {
-				const { uploads } = await butler.request('Fetch.GameUploads', { gameId: game.id, compatible: false, fresh: true });
-				return uploads.map(i => ({ ...i, game }));
-			})
-		)
+		await games.reduce(async (acc, game) => {
+			const result = await acc;
+			const { uploads } = await butler.request('Fetch.GameUploads', { gameId: game.id, compatible: false, fresh: true });
+			result.push(uploads.map(i => ({ ...i, game })));
+			return result;
+		}, Promise.resolve([]))
 	).flat();
 
 	// queue downloads
-	const downloads = await Promise.all(
-		uploads.map(async upload => {
-			const dir = path.join(sanitizeFilename(upload.game.title), sanitizeFilename((upload.displayName || upload.filename).replace(/\.zip$/i, '')));
-			const stagingFolder = path.join(dirTemp, 'staging', dir);
-			const installFolder = path.join(dirOutput, dir);
-			const download = await butler.request('Install.Queue', {
-				game: upload.game,
-				upload,
-				noCave: true,
-				fastQueue: true,
-				queueDownload: true,
-				ignoreInstallers: true,
-				installFolder,
-				stagingFolder,
-			});
-			return download;
-		})
-	);
+	const downloads = await uploads.reduce(async (acc, upload) => {
+		const result = await acc;
+		const dir = path.join(sanitizeFilename(upload.game.title), sanitizeFilename((upload.displayName || upload.filename).replace(/\.zip$/i, '')));
+		const stagingFolder = path.join(dirTemp, 'staging', dir);
+		const installFolder = path.join(dirOutput, dir);
+		const download = await butler.request('Install.Queue', {
+			game: upload.game,
+			upload,
+			noCave: true,
+			fastQueue: true,
+			queueDownload: true,
+			ignoreInstallers: true,
+			installFolder,
+			stagingFolder,
+		});
+		result.push(download);
+		return result;
+	}, Promise.resolve([]));
 
 	// actually download
-	await Promise.all(
-		downloads.map(
-			async download =>
-				await butler.request('Install.Perform', {
-					id: download.id,
-					stagingFolder: download.stagingFolder,
-				})
-		)
-	);
+	await downloads.reduce(async (acc, download) => {
+		await acc;
+		await butler.request('Install.Perform', {
+			id: download.id,
+			stagingFolder: download.stagingFolder,
+		});
+	}, Promise.resolve());
 
 	// download thumbnails
 	await games
@@ -128,9 +126,8 @@ async function getButler() {
 		await result;
 		return fs.promises.writeFile(path.join(dirOutput, sanitizeFilename(i.title), 'metadata.json'), JSON.stringify(i, undefined, '\t'));
 	}, Promise.resolve());
-	
-	const totalMetadata = games
-		.sort((a, b) => b.published_at.localeCompare(a.published_at));
+
+	const totalMetadata = games.sort((a, b) => b.published_at.localeCompare(a.published_at));
 	await fs.promises.writeFile(path.join(dirOutput, 'metadata.json'), JSON.stringify(totalMetadata, undefined, '\t'));
 })()
 	.then(() => {
