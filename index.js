@@ -46,7 +46,6 @@ const { output: dirOutput, dryRun } = yargs(process.argv.slice(2))
 	})
 	.help()
 	.epilog('Requires a copy of butler and an itch.io API key, which can be found here:\n- https://itch.io/docs/butler/installing.html\n- https://itch.io/user/settings/api-keys').argv;
-console.log({ dirOutput, dryRun });
 
 async function getGames() {
 	const response = await fetch(`https://itch.io/api/1/${apiKey}/my-games`);
