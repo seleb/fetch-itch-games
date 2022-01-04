@@ -4,7 +4,7 @@
 import { Client, createNotification, createRequest, Instance } from 'butlerd';
 import dotenvLoad from 'dotenv-load';
 import download from 'download';
-import fs from 'fs';
+import fs from 'fs-extra';
 import fetch from 'node-fetch';
 import os from 'os';
 import path from 'path';
@@ -159,14 +159,15 @@ const files = [];
 		files.push(fileMetadata);
 		if (dryRun) return;
 		console.log(`Saving metadata "${i.title}"...`);
-		return fs.promises.writeFile(fileMetadata, JSON.stringify(i, undefined, '\t'));
+		await fs.ensureDir(path.join(dirOutput, sanitizeFilename(i.title)));
+		return fs.writeFile(fileMetadata, JSON.stringify(i, undefined, '\t'));
 	}, Promise.resolve());
 
 	const fileTotalMetadata = path.join(dirOutput, 'metadata.json');
 	files.push(path.join(dirOutput, 'metadata.json'));
 	if (dryRun) return;
 	console.log('Saving total metadata...');
-	await fs.promises.writeFile(fileTotalMetadata, JSON.stringify(games, undefined, '\t'));
+	await fs.writeFile(fileTotalMetadata, JSON.stringify(games, undefined, '\t'));
 })()
 	.then(() => {
 		if (dryRun) {
