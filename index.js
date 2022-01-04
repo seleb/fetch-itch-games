@@ -10,21 +10,43 @@ import os from 'os';
 import path from 'path';
 import sanitizeFilename from 'sanitize-filename';
 import which from 'which';
+import yargs from 'yargs';
+
 dotenvLoad();
 
 const apiKey = process.env.API_KEY;
-if (!apiKey) {
-	console.error('Missing API key.');
-	process.exit(1);
-}
-
 const dirTemp = os.tmpdir();
 
-const [dirOutput] = process.argv.slice(2);
-if (!dirOutput) {
-	console.error('Missing output directory.');
-	process.exit(1);
-}
+const { output: dirOutput, dryRun } = yargs(process.argv.slice(2))
+	.usage('Usage: $0 <output> [options]')
+	.example('API_KEY=abcd1234 $0 -o games', 'Download to folder "games"')
+	.example('API_KEY=abcd1234 $0 -o . --dry-run', 'List what would be downloaded')
+	.option('o', {
+		alias: 'output',
+		describe: 'Folder to download files to.',
+		type: 'string',
+		nargs: 1,
+		required: true,
+	})
+	.option('d', {
+		alias: 'dry-run',
+		describe: 'Print files without downloading them.',
+		type: 'boolean',
+		nargs: 0,
+	})
+	.check(({ output }) => {
+		if (!output) {
+			throw new Error('Output folder required.');
+		}
+
+		if (!apiKey) {
+			throw new Error('Missing API key. You can get one here: https://itch.io/user/settings/api-keys');
+		}
+		return true;
+	})
+	.help()
+	.epilog('Requires a copy of butler and an itch.io API key, which can be found here:\n- https://itch.io/docs/butler/installing.html\n- https://itch.io/user/settings/api-keys').argv;
+console.log({ dirOutput, dryRun });
 
 async function getGames() {
 	const response = await fetch(`https://itch.io/api/1/${apiKey}/my-games`);
@@ -61,6 +83,7 @@ async function getButler() {
 	return butler;
 }
 
+const files = [];
 (async function main() {
 	const butler = await getButler();
 
@@ -81,6 +104,8 @@ async function getButler() {
 		const dir = path.join(sanitizeFilename(upload.game.title), sanitizeFilename((upload.displayName || upload.filename).replace(/\.zip$/i, '')));
 		const stagingFolder = path.join(dirTemp, 'staging', dir);
 		const installFolder = path.join(dirOutput, dir);
+		files.push(installFolder);
+		if (dryRun) return result;
 		const download = await butler.request('Install.Queue', {
 			game: upload.game,
 			upload,
@@ -119,23 +144,35 @@ async function getButler() {
 		.filter(i => i.url)
 		.reduce(async (result, i) => {
 			await result;
+			const fileThumbnail = `${i.dest}.${i.url.split('.').pop()}`;
+			files.push(path.join(dirOutput, fileThumbnail));
+			if (dryRun) return result;
 			console.log('Saving ', i.dest);
-			return download(i.url, dirOutput, { filename: `${i.dest}.${i.url.split('.').pop()}` });
+			return download(i.url, dirOutput, { filename: fileThumbnail });
 		}, Promise.resolve());
 
 	// save metadata
 	await games.reduce(async (result, i) => {
 		await result;
+		const fileMetadata = path.join(dirOutput, sanitizeFilename(i.title), 'metadata.json');
+		files.push(fileMetadata);
+		if (dryRun) return;
 		console.log('Saving metadata for ', i.title);
-		return fs.promises.writeFile(path.join(dirOutput, sanitizeFilename(i.title), 'metadata.json'), JSON.stringify(i, undefined, '\t'));
+		return fs.promises.writeFile(fileMetadata, JSON.stringify(i, undefined, '\t'));
 	}, Promise.resolve());
 
-	const totalMetadata = games.sort((a, b) => b.published_at.localeCompare(a.published_at));
+	const fileTotalMetadata = path.join(dirOutput, 'metadata.json');
+	files.push(path.join(dirOutput, 'metadata.json'));
+	if (dryRun) return;
 	console.log('Saving total metadata');
-	await fs.promises.writeFile(path.join(dirOutput, 'metadata.json'), JSON.stringify(totalMetadata, undefined, '\t'));
+	await fs.promises.writeFile(fileTotalMetadata, JSON.stringify(games, undefined, '\t'));
 })()
 	.then(() => {
-		console.log('✅');
+		if (dryRun) {
+			console.log(JSON.stringify(files.sort(), undefined, 1));
+		} else {
+			console.log('✅');
+		}
 		process.exit(0);
 	})
 	.catch(err => {
