@@ -7,6 +7,7 @@ Files downloaded will include each available build for the game, two image files
 
 Dependencies:
 
+- [node/npm](https://nodejs.org/en/download)
 - [butler](https://itch.io/docs/butler/installing.html)
 - an [itch.io API key](https://itch.io/user/settings/api-keys) for your account
 
