@@ -12,6 +12,10 @@
   "bin": {
     "fetch-itch-games": "node index.js"
   },
+  "files": [
+    "index.js",
+    ".env"
+  ],
   "dependencies": {
     "butlerd": "^14.1.0",
     "dotenv-load": "^2.0.0",
