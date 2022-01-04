@@ -3,7 +3,7 @@
 This project allows you to download all of the games on [itch.io](https://itch.io) associated with a provided API key.
 This can be useful for creating a backup of the files you've uploaded to itch for your own storage or for porting to another platform.
 
-Files downloaded will include each available build for the game, two image files (`cover` and `still_cover`), a `metadata.json` describing the game. The root folder will also include a `metadata.json` describing all of the games in a list.
+Files downloaded will include each available build for the game, two image files (`cover` and `still_cover`), and a `metadata.json` describing the game. The root folder will also include a `metadata.json` describing all of the games in a list.
 
 Dependencies:
 
