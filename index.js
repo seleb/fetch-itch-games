@@ -18,7 +18,7 @@ const apiKey = process.env.API_KEY;
 const dirTemp = os.tmpdir();
 
 const { output: dirOutput, dryRun, published } = yargs(process.argv.slice(2))
-	.usage('Usage: $0 <output> [options]')
+	.usage('Usage: $0 -o output [--dry-run] [--published]')
 	.example('API_KEY=abcd1234 $0 -o games', 'Download to folder "games"')
 	.example('API_KEY=abcd1234 $0 -o . --dry-run', 'List what would be downloaded')
 	.option('o', {
@@ -50,7 +50,8 @@ const { output: dirOutput, dryRun, published } = yargs(process.argv.slice(2))
 		}
 		return true;
 	})
-	.help()
+	.help('h')
+	.alias('h', 'help')
 	.epilog('Requires a copy of butler and an itch.io API key, which can be found here:\n- https://itch.io/docs/butler/installing.html\n- https://itch.io/user/settings/api-keys').argv;
 
 async function getGames() {

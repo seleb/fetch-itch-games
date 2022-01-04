@@ -14,7 +14,7 @@ Dependencies:
 ## Usage
 
 ```sh
-npx fetch-itch-games -o output [--dry-run]
+npx fetch-itch-games -o output [--dry-run] [--published]
 ```
 
 ## Examples
