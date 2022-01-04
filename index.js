@@ -116,6 +116,7 @@ async function getButler() {
 				dest: path.join(sanitizeFilename(title), 'still_cover'),
 			},
 		])
+		.filter(i => i.url)
 		.reduce(async (result, i) => {
 			await result;
 			return download(i.url, dirOutput, { filename: `${i.dest}.${i.url.split('.').pop()}` });
