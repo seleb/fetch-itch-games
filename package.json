@@ -10,7 +10,7 @@
     "start": "node index.js"
   },
   "bin": {
-    "fetch-itch-games": "node index.js"
+    "fetch-itch-games": "./index.js"
   },
   "files": [
     "index.js",
