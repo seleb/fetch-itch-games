@@ -17,7 +17,7 @@ dotenvLoad();
 const apiKey = process.env.API_KEY;
 const dirTemp = os.tmpdir();
 
-const { output: dirOutput, dryRun } = yargs(process.argv.slice(2))
+const { output: dirOutput, dryRun, published } = yargs(process.argv.slice(2))
 	.usage('Usage: $0 <output> [options]')
 	.example('API_KEY=abcd1234 $0 -o games', 'Download to folder "games"')
 	.example('API_KEY=abcd1234 $0 -o . --dry-run', 'List what would be downloaded')
@@ -31,6 +31,12 @@ const { output: dirOutput, dryRun } = yargs(process.argv.slice(2))
 	.option('d', {
 		alias: 'dry-run',
 		describe: 'Print files without downloading them.',
+		type: 'boolean',
+		nargs: 0,
+	})
+	.option('p', {
+		alias: 'published',
+		describe: 'Filter out unpublished games.',
 		type: 'boolean',
 		nargs: 0,
 	})
@@ -50,7 +56,10 @@ const { output: dirOutput, dryRun } = yargs(process.argv.slice(2))
 async function getGames() {
 	const response = await fetch(`https://itch.io/api/1/${apiKey}/my-games`);
 	const data = await response.json();
-	const games = data.games;
+	let games = data.games;
+	if (published) {
+		games = games.filter(i => i.published);
+	}
 	return games;
 }
 
