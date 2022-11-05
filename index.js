@@ -35,7 +35,7 @@ import sanitizeFilename from 'sanitize-filename';
 			thumbnail: `thumbnails/${sanitizeFilename(title).trim()}/thumbnail.${cover_url.split('.').pop()}`,
 			preview: `thumbnails/${sanitizeFilename(title).trim()}/preview.${(still_cover_url || cover_url).split('.').pop()}`,
 			association: '',
-			date: moment(published_at).format('MMMM YYYY'),
+			date: moment(published_at).format('YYYY MMMM DD'),
 			tagline,
 			description: '',
 			links: [url],
