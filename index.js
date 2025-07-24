@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 // @ts-check
+import 'dotenv-flow/config';
+
 import { Client, createNotification, createRequest, Instance } from 'butlerd';
-import dotenvLoad from 'dotenv-load';
 import download from 'download';
 import fs from 'fs-extra';
 import fetch from 'node-fetch';
@@ -11,8 +12,6 @@ import path from 'path';
 import sanitizeFilename from 'sanitize-filename';
 import which from 'which';
 import yargs from 'yargs';
-
-dotenvLoad();
 
 const apiKey = process.env.API_KEY;
 const dirTemp = os.tmpdir();
