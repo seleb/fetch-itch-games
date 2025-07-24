@@ -57,7 +57,7 @@ async function getGames() {
 	const response = await fetch(`https://itch.io/api/1/${apiKey}/my-games`);
 	const data = await response.json();
 	let games = data.games;
-	games.sort((a, b) => b.published_at.localeCompare(a.published_at));
+	games.sort((a, b) => (b.published_at ?? b.created_at).localeCompare(a.published_at ?? a.created_at));
 	if (published) {
 		games = games.filter(i => i.published);
 	}
